@@ -34,6 +34,28 @@ def load_glove(embedding_dim=300, checkpoint_path=".vector_cache"):
     print("Done loading glove")
 
     return nn.Embedding.from_pretrained(torch.from_numpy(embs_npa).float())
+
+
+class SinePositionalEncoding(nn.Module):
+    def __init__(self, d_model: int, dropout=0.1, max_len=5000):
+        super().__init__()
+        self.dropout = nn.Dropout(p=dropout)
+
+        position = torch.arange(max_len).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2) * (-math.log(10000.0) / d_model))
+
+        pe = torch.zeros(max_len, 1, d_model)
+        pe[:, 0, 0::2] = torch.sin(position * div_term)
+        pe[:, 0, 1::2] = torch.cos(position * div_term)
+        self.register_buffer('pe', pe)
+
+    def forward(self, x: Tensor) -> Tensor:
+        """
+        Args:
+            x: Tensor, shape [seq_len, batch_size, embedding_dim]
+        """
+        x = x + self.pe[:x.size(0)]
+        return self.dropout(x)
     
 
 class HopfieldTransformerEncoder(nn.Module):
@@ -73,7 +95,7 @@ class HopfieldTransformerEncoder(nn.Module):
         
         return x
     
-class SSTClassifier(nn.Module):
+class SSTHopfieldClassifier(nn.Module):
     def __init__(self,
         use_glove_embedding=True,
         embedding_dim=300,
@@ -82,7 +104,7 @@ class SSTClassifier(nn.Module):
         num_layers=12,
         dropout=0.1,
         num_classes=5,
-        embedding_reduction="mean"
+        reduction="mean"
     ):
         super().__init__()
     
@@ -90,6 +112,8 @@ class SSTClassifier(nn.Module):
             self.embedding = load_glove(embedding_dim)
         else:
             self.embedding = nn.Embedding(400002, embedding_dim)
+        
+        self.positional_encoding = SinePositionalEncoding(dropout=dropout)
         
         self.encoder = HopfieldTransformerEncoder(
             d_model=embedding_dim,
@@ -99,16 +123,16 @@ class SSTClassifier(nn.Module):
             dropout=dropout
         )
 
-        self.embedding_reduction = embedding_reduction
+        self.embedding = reduction
         self.fc = nn.Linear(embedding_dim, num_classes)
     
     def forward(self, src, src_mask=None, src_padding_mask=None):
         x = self.embedding(src)
         x = self.encoder(x, src_mask, src_padding_mask)
 
-        if self.embedding_reduction == "mean":
+        if self.reduction == "mean":
             x = x.mean(dim=0, keepdim=True).squeeze(0)
         else:
-            raise ValueError(f"Invalid embedding reduction method.")
+            raise ValueError(f"Invalid reduction method.")
         
         return self.fc(x)
