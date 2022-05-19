@@ -2,7 +2,7 @@ import argparse
 import torch
 import os
 import json
-
+from models import SSTHopfieldClassifier
 from datasets import select_dataset
 
 
@@ -18,8 +18,8 @@ def parse_arguments():
     parser.add_argument('--save_every', default=-1, type=int, help="Save a checkpoint every x epochs. -1 denotes no intermediate saving")
     
     # Training settings
-    parser.add_argument('--batch_size', default=64, type=int)
-    parser.add_argument('-lr', '--learning_rate', default=1e-4, type=float)
+    parser.add_argument('--batch_size', default=8, type=int)
+    parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--epochs', default=10, type=int)
 
     # TODO: model settings
@@ -52,21 +52,19 @@ def evaluate(model, data, pad_index):
     return accuracy / len(data)
 
 
-def train(model, args):
+def train(args):
     """ Train the model and return it. """
     print("=== Starting Training ===")
 
     device = torch.device(args.device)
 
     # Set seed for reproducibility
-    #random.seed(seed)
-    #np.random.seed(seed)
     torch.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = True
 
     # Load the data.
     train_data, val_data, test_data, pad_index = select_dataset(args.dataset, args.batch_size, device)
-    
+    model = SSTHopfieldClassifier()
     # Define optimizer and criterion.
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)  # Could add a lr-scheduler.
     criterion = torch.nn.CrossEntropyLoss(ignore_index=pad_index).to(device)
@@ -95,7 +93,7 @@ def train(model, args):
         epoch_acc = 0
 
         for batch in train_data:
-            # FIXME: the SNLI dataset contains hypothesis and premis instead of text.
+            # TODO: SNLI dataset change the text=premise+[SEP]+hypothesis
             text = batch.text
             labels = batch.label
 
@@ -107,7 +105,6 @@ def train(model, args):
 
             loss.backward()
             optimizer.step()
-
             epoch_loss += loss.item()
             epoch_acc += acc
         
@@ -151,5 +148,4 @@ def train(model, args):
 if __name__ == '__main__':
     args = parse_arguments()
 
-    # model = ... # TODO:
-    # train(model, args)
+    train(args)

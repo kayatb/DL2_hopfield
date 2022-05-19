@@ -1,39 +1,19 @@
 import torch
 import torch.nn as nn
-
+import math
 import numpy as np
 
 from hflayers import Hopfield
 from hflayers.transformer import HopfieldEncoderLayer
+from torchtext import vocab
 
 
-def load_glove(embedding_dim=300, checkpoint_path=".vector_cache"):
+def load_glove(embedding_dim=300):
     print("Loading glove")
     
-    vocab,embeddings = [],[]
-    with open(f"{checkpoint_path}/glove.6B.{embedding_dim}d.txt", "rt") as f:
-        full_content = f.read().strip().split('\n')
-
-    for i in range(len(full_content)):
-        i_word = full_content[i].split(" ")[0]
-        i_embeddings = [float(val) for val in full_content[i].split(' ')[1:]]
-        vocab.append(i_word)
-        embeddings.append(i_embeddings)
-
-    vocab_npa = np.array(vocab)
-    embs_npa = np.array(embeddings)
-
-    vocab_npa = np.insert(vocab_npa, 0, '<pad>')
-    vocab_npa = np.insert(vocab_npa, 1, '<unk>')
-
-    pad_emb_npa = np.zeros((1,embs_npa.shape[1]))
-    unk_emb_npa = np.mean(embs_npa,axis=0,keepdims=True)
-
-    embs_npa = np.vstack((pad_emb_npa,unk_emb_npa,embs_npa))
-
+    glove_embeddings = vocab.GloVe(name='840B', dim=embedding_dim)
     print("Done loading glove")
-
-    return nn.Embedding.from_pretrained(torch.from_numpy(embs_npa).float())
+    return nn.Embedding.from_pretrained(glove_embeddings.vectors)
 
 
 class SinePositionalEncoding(nn.Module):
@@ -49,7 +29,7 @@ class SinePositionalEncoding(nn.Module):
         pe[:, 0, 1::2] = torch.cos(position * div_term)
         self.register_buffer('pe', pe)
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x):
         """
         Args:
             x: Tensor, shape [seq_len, batch_size, embedding_dim]
@@ -63,8 +43,8 @@ class HopfieldTransformerEncoder(nn.Module):
         self,
         d_model,
         nhead=12,
-        dim_feed_forward=2048,
-        num_layers=12,
+        dim_feed_forward=768,
+        num_layers=1,
         dropout=0.1
     ):
         super().__init__()
@@ -94,7 +74,8 @@ class HopfieldTransformerEncoder(nn.Module):
             x = layer(x, src_mask, src_padding_mask)
         
         return x
-    
+
+
 class SSTHopfieldClassifier(nn.Module):
     def __init__(self,
         use_glove_embedding=True,
@@ -113,7 +94,7 @@ class SSTHopfieldClassifier(nn.Module):
         else:
             self.embedding = nn.Embedding(400002, embedding_dim)
         
-        self.positional_encoding = SinePositionalEncoding(dropout=dropout)
+        self.positional_encoding = SinePositionalEncoding(embedding_dim, dropout=dropout)
         
         self.encoder = HopfieldTransformerEncoder(
             d_model=embedding_dim,
@@ -123,7 +104,7 @@ class SSTHopfieldClassifier(nn.Module):
             dropout=dropout
         )
 
-        self.embedding = reduction
+        self.reduction = reduction
         self.fc = nn.Linear(embedding_dim, num_classes)
     
     def forward(self, src, src_mask=None, src_padding_mask=None):

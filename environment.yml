@@ -1,0 +1,18 @@
+name: D2Hopfield
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7.5
+  - pip=20.2.4
+  - pytorch=1.8.0
+  - pip:
+    - torchtext==0.9.0
+    - seaborn==0.11.0
+    - tensorboard==2.3.0
+    - tabulate==0.8.7
+    - tqdm==4.50.2
+    - pillow==8.0.1
+    - spacy==2.3.0
+    - sklearn
