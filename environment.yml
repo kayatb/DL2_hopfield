@@ -1,4 +1,4 @@
-name: D2Hopfield
+name: DL2Hopfield
 channels:
   - pytorch
   - conda-forge
@@ -6,9 +6,11 @@ channels:
 dependencies:
   - python=3.7.5
   - pip=20.2.4
-  - pytorch=1.8.0
+  - pytorch=1.6.0
+  - torchvision=0.7.0
   - pip:
-    - torchtext==0.9.0
+    - pytorch-lightning==1.0.3
+    - torchtext==0.6.0
     - seaborn==0.11.0
     - tensorboard==2.3.0
     - tabulate==0.8.7
