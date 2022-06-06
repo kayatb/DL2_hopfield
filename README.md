@@ -40,13 +40,12 @@ This saves the best model in the pl_logs folder. Use the path to run the sentenc
 We use the SentEval toolkit from Facebook - https://github.com/facebookresearch/SentEval
 
 The setup is not required since the code is already part of this repository, however downloading the evaluation dataset is needed. 
-To get all the transfer tasks datasets, run (in data/downstream/):
-Run the script inside SentEval folder
+To get all the transfer tasks datasets, run the script inside SentEval folder
 
-`./SentEval/data/get_transfer_data.bash`
+`./SentEval/data/downstream/get_transfer_data.bash`
 
 Place the SNLI dataset downloaded in the pretrained folder. If downloaded via our code, it should be present in .vector_cache or .data. 
-To performance the Sentence Evaluation on all the tasks run
+To perform the Sentence Evaluation on all the tasks run
 
 `python SentenceEval.py --model Hopfield`
 
