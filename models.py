@@ -1,16 +1,21 @@
 import torch
 import torch.nn as nn
+<<<<<<< HEAD
 import torch.nn.functional as F
 
+=======
+>>>>>>> 80b5981 (changes to work on lisa & changes to load SNLI)
 import math
 import numpy as np
 
 from hflayers import Hopfield
 from hflayers.transformer import HopfieldEncoderLayer
+from torchtext import vocab
 
 
-def load_glove(embedding_dim=300, checkpoint_path=".vector_cache"):
+def load_glove(embedding_dim=300):
     print("Loading glove")
+<<<<<<< HEAD
 
     vocab, embeddings = [], []
     with open(f"{checkpoint_path}/glove.6B.{embedding_dim}d.txt", "rt") as f:
@@ -35,9 +40,12 @@ def load_glove(embedding_dim=300, checkpoint_path=".vector_cache"):
 
     embs_npa = np.vstack((pad_emb_npa, unk_emb_npa, cls_emb_npa, embs_npa))
 
+=======
+    
+    glove_embeddings = vocab.GloVe(name='840B', dim=embedding_dim)
+>>>>>>> 80b5981 (changes to work on lisa & changes to load SNLI)
     print("Done loading glove")
-
-    return nn.Embedding.from_pretrained(torch.from_numpy(embs_npa).float())
+    return nn.Embedding.from_pretrained(glove_embeddings.vectors)
 
 
 class SinePositionalEncoding(nn.Module):
@@ -57,13 +65,30 @@ class SinePositionalEncoding(nn.Module):
         self.register_buffer("pe", pe)
 
     def forward(self, x):
+<<<<<<< HEAD
         x = x + self.pe[: x.size(0), :]
+=======
+        """
+        Args:
+            x: Tensor, shape [seq_len, batch_size, embedding_dim]
+        """
+        x = x + self.pe[:x.size(0)]
+>>>>>>> 80b5981 (changes to work on lisa & changes to load SNLI)
         return self.dropout(x)
 
 
 class HopfieldTransformerEncoder(nn.Module):
     def __init__(
+<<<<<<< HEAD
         self, d_model, nhead=12, dim_feed_forward=2048, num_layers=12, dropout=0.1
+=======
+        self,
+        d_model,
+        nhead=12,
+        dim_feed_forward=768,
+        num_layers=1,
+        dropout=0.1
+>>>>>>> 80b5981 (changes to work on lisa & changes to load SNLI)
     ):
         super().__init__()
 
@@ -109,12 +134,19 @@ class SSTHopfieldClassifier(nn.Module):
         if use_glove_embedding:
             self.embedding = load_glove(embedding_dim)
         else:
+<<<<<<< HEAD
             self.embedding = nn.Embedding(250883, embedding_dim)
 
         self.positional_encoding = SinePositionalEncoding(
             embedding_dim, dropout=dropout
         )
 
+=======
+            self.embedding = nn.Embedding(400002, embedding_dim)
+        
+        self.positional_encoding = SinePositionalEncoding(embedding_dim, dropout=dropout)
+        
+>>>>>>> 80b5981 (changes to work on lisa & changes to load SNLI)
         self.encoder = HopfieldTransformerEncoder(
             d_model=embedding_dim,
             nhead=nhead,
@@ -189,7 +221,12 @@ class BERTClassifier(nn.Module):
             x = x[0, :, :].squeeze(0)
         elif self.reduction != "none":
             raise ValueError(f"Invalid reduction method.")
+<<<<<<< HEAD
 
         x = self.fc(F.relu(x))
 
         return x
+=======
+        
+        return self.fc(x)
+>>>>>>> 80b5981 (changes to work on lisa & changes to load SNLI)
