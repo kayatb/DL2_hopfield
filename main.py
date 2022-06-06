@@ -3,7 +3,7 @@ import os
 import pytorch_lightning as pl
 from torch.optim.lr_scheduler import StepLR
 from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
-from dataset import *
+from datasets import *
 from models.transformers import HopfieldTransformerEncoder
 import torch
 import torch.nn as nn
@@ -160,7 +160,7 @@ class PLCallback(pl.Callback):
 def train_model(args):
     print("STARTING")
     os.makedirs(args.log_dir, exist_ok=True)
-    vocab, labels, train_iter, dev_iter, test_iter = load_snli(device=None, batch_size=args.batch_size)
+    vocab, labels, train_iter, dev_iter, test_iter = load_pl_snli(device=None, batch_size=args.batch_size)
     print("DATASET LOADED")
     # Checking the train_iter
     if not args.checkpoint_dir:
@@ -206,7 +206,7 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser.add_argument('--model', default='Hopfield', type=str,
-                        help='What model to use. Default is AWE')
+                        help='What model to use. Default is Hopfieldg')
 
     parser.add_argument('--lr', default=0.1, type=float,
                         help='Learning rate to use. Default is 0.1')

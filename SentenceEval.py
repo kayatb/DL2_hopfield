@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # added parser for selecting the model
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--model', default='AWE', type=str,
+    parser.add_argument('--model', default='Hopfield', type=str,
                         help='What model to use. Default is AWE',
                         choices=['Hopfield', 'BERT'])
     args = parser.parse_args()
