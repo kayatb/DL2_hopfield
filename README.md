@@ -16,8 +16,8 @@ We use 3 datasets.
 
 All 3 datasets are auto downloaded the first time train.py or main.py is called. 
 
-# Examples 
-An example of how to run the code with `main.py`. 
+# Example Training 
+An example of how to run the code with `main.py` or `train.py`. 
 1. SST Dataset
 
 `python train.py --batch_size 16 --dataset SST --save_every 1` 
