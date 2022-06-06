@@ -1,14 +1,14 @@
 # Are Hopfield Networks All You Need?
  
-This codebase extends the Hopfield Network based on the paper [Hopfield Network is All you need](https://arxiv.org/abs/2008.02217).
-We verify the performance of the modern Hopfield Network on a variety of NLP tasks to investigate their usability and performance over modern BERT like networks.
+This codebase extends the Hopfield Network based on the paper [Hopfield Networks is All You Need](https://arxiv.org/abs/2008.02217).
+We verify the performance of the modern Hopfield Network on a variety of NLP tasks to investigate their usability and performance compared to modern BERT-like networks.
 
 # Environment Setup
-Ideally setup a conda environment and install all the requirements. Code for SentEval and Hopfield is bundled as part of the repo, so additional installation is not required.
+Ideally, setup a virtual environment and install all the requirements. Code for SentEval and Hopfield is bundled as part of the repo, so additional installation is not required.
 Use environment.yml or the requirementst.txt to setup your environment.
 
 # Code Setup
-We run the pytorch code in train.py for a quick training of the model. For transfer task evaluation(SentEval), use the main.py which is a pytorch lightning implementation that freezes and saves the trained hopfield encoder separately to use it for downstream tasks.
+We run the PyTorch code in `train.py` for a quick training of the model. For transfer task evaluation (SentEval), use the `main.py` which is a PyTorch Lightning implementation that freezes and saves the trained hopfield encoder separately to use it for downstream tasks.
 
 # Downloading Dataset and Setting up Project
 We use 3 datasets.
@@ -16,7 +16,7 @@ We use 3 datasets.
 2. UDPOS
 3. SNLI
 
-All 3 datasets are auto downloaded the first time train.py or main.py is called. 
+All 3 datasets are automatically downloaded the first time `train.py` or `main.py` is called. 
 
 # Example Training 
 An example of how to run the code with `main.py` or `train.py`. 
