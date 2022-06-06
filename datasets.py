@@ -1,4 +1,4 @@
-from torchtext.legacy import data, datasets
+from torchtext import data, datasets
 import torch
 
 
