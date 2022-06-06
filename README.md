@@ -1,5 +1,7 @@
-# DL2_hopfield 
+# Are Hopfield Networks All You Need?
+ 
 This codebase extends the Hopfield Network based on the paper [Hopfield Network is All you need](https://arxiv.org/abs/2008.02217).
+We verify the performance of the modern Hopfield Network on a variety of NLP tasks to investigate their usability and performance over modern BERT like networks.
 
 # Environment Setup
 Ideally setup a conda environment and install all the requirements. Code for SentEval and Hopfield is bundled as part of the repo, so additional installation is not required.
